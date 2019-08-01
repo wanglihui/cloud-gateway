@@ -91,25 +91,7 @@ main()
     process.exit(-1);
 })
 
-process.on('beforeExit', ()=> {
-    //调用注销程序
-    console.log("exit...")
-    return registryClient.unRegistry();
-});
-
-process.once('SIGINT', () => {
-    console.log("SIGINT")
-})
-
-process.once('SIGKILL', () => {
-    console.log("SIGKILL")
-})
-
-
-process.once('SIGTERM', () => {
-    console.log("SIGTERM")
-})
-
-process.once('SIGHUP', () => {
-    console.log("SIGHUP")
+const death = require('death');
+death(function() {
+    registryClient.unRegistry();
 })
