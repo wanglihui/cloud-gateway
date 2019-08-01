@@ -7,7 +7,7 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
-app.use(bodyParser.raw());
+// app.use(bodyParser.raw());
 const router = express.Router();
 const ProxyRequest = require("express-request-proxy");
 
@@ -89,4 +89,27 @@ main()
 .catch( (err) => {
     console.error('系统启动失败：', err);
     process.exit(-1);
+})
+
+process.on('beforeExit', ()=> {
+    //调用注销程序
+    console.log("exit...")
+    return registryClient.unRegistry();
+});
+
+process.once('SIGINT', () => {
+    console.log("SIGINT")
+})
+
+process.once('SIGKILL', () => {
+    console.log("SIGKILL")
+})
+
+
+process.once('SIGTERM', () => {
+    console.log("SIGTERM")
+})
+
+process.once('SIGHUP', () => {
+    console.log("SIGHUP")
 })
