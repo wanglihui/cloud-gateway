@@ -9,17 +9,39 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.raw());
 const router = express.Router();
+const ProxyRequest = require("express-request-proxy");
 
 scannerDecoration(path.resolve(__dirname, 'server'), [/\.js$/, /\.js\.map$/, /\.\d.ts$/]);
-registerControllerToRouter(router);
+registerControllerToRouter(router, {isShowUrls: true});
 
-app.use('/api/v1', router);
+app.use('/api/v1/', router);
+app.use(/^\/apps\/([^/]+)(.*)/, async function(req, res, next) {
+    const serviceName = req.params[0];
+    const url = req.params[1];
+    let services = await registryClient.getServices();
+    let avaServices = services.filter( (service) => {
+        return service && service.name == serviceName;
+    });
+    if (!avaServices || !avaServices.length) {
+        res.status(404);
+        res.json({
+            code: 404,
+            msg: `SERVER "${serviceName}"  NOT EXISTS OR STATUS NOT ENABLED!`
+        })
+    }
+    const service = avaServices[0];
+    const proxy = ProxyRequest({
+        url: `http://127.0.0.1:${service.port}${url}`,
+    });
+    proxy(req, res, next);
+});
 
 import * as http from 'http';
 import * as net from 'net';
 async function main() {
     await startServer({
-        registry: "http://localhost:5000/api/v1/app"
+        port: 8090,
+        registry: "http://localhost:8080/api/v1/app"
     });
 }
 

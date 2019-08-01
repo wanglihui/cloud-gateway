@@ -1,11 +1,12 @@
 {
-  "name": "cloud-template",
+  "name": "cloud-gateway",
   "version": "0.0.1",
-  "description": "cloud project template",
+  "description": "cloud micservice gateway",
   "main": "dist/main.js",
   "dependencies": {
     "cloud-registry-client": "0.0.8",
     "express": "^4.17.1",
+    "express-request-proxy": "^2.2.2",
     "ts-express-restful": "^6.0.1",
     "ts-node": "^8.3.0"
   },
