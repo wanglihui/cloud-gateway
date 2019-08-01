@@ -2,13 +2,12 @@ import express  = require('express');
 import registryClient, {RegistryClient} from 'cloud-registry-client';
 import {scannerDecoration, registerControllerToRouter} from 'ts-express-restful';
 import * as path from 'path';
-import * as bodyParser from 'body-parser';
+import bodyParser from 'body-parser';
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
-// app.use(bodyParser.raw());
 const router = express.Router();
+router.use(bodyParser.json());
+router.use(bodyParser.urlencoded());
 const ProxyRequest = require("express-request-proxy");
 
 scannerDecoration(path.resolve(__dirname, 'server'), [/\.js$/, /\.js\.map$/, /\.\d.ts$/]);
@@ -18,22 +17,30 @@ app.use('/api/v1/', router);
 app.use(/^\/apps\/([^/]+)(.*)/, async function(req, res, next) {
     const serviceName = req.params[0];
     const url = req.params[1];
-    let services = await registryClient.getServices();
-    let avaServices = services.filter( (service) => {
-        return service && service.name == serviceName;
-    });
-    if (!avaServices || !avaServices.length) {
-        res.status(404);
+    try {
+        let services = await registryClient.getServices();
+        let avaServices = services.filter( (service) => {
+            return service && service.name == serviceName;
+        });
+        if (!avaServices || !avaServices.length) {
+            res.status(404);
+            res.json({
+                code: 404,
+                msg: `SERVER "${serviceName}"  NOT EXISTS OR STATUS NOT ENABLED!`
+            })
+        }
+        const service = avaServices[0];
+        const proxy = ProxyRequest({
+            url: `http://127.0.0.1:${service.port}${url}`,
+        });
+        proxy(req, res, next);
+    } catch(err) {
+        console.error(err);
         res.json({
-            code: 404,
-            msg: `SERVER "${serviceName}"  NOT EXISTS OR STATUS NOT ENABLED!`
+            code: 500,
+            msg: `转发请求给${serviceName}服务时错误！`
         })
     }
-    const service = avaServices[0];
-    const proxy = ProxyRequest({
-        url: `http://127.0.0.1:${service.port}${url}`,
-    });
-    proxy(req, res, next);
 });
 
 import * as http from 'http';
