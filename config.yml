@@ -1,0 +1,4 @@
+name: cloud-template
+env: public
+port: 0
+registry: false

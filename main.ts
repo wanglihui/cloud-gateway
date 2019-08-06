@@ -1,17 +1,21 @@
+import C from 'cloud-conf';
 import express  = require('express');
 import registryClient, {RegistryClient} from 'cloud-registry-client';
 import {scannerDecoration, registerControllerToRouter} from 'ts-express-restful';
 import * as path from 'path';
 import bodyParser from 'body-parser';
 const app = express();
-
+import {CloudError} from 'cloud-error';
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
+// app.use(bodyParser.raw());
 const router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded());
 const ProxyRequest = require("express-request-proxy");
 
-scannerDecoration(path.resolve(__dirname, 'server'), [/\.js$/, /\.js\.map$/, /\.\d.ts$/]);
-registerControllerToRouter(router, {isShowUrls: true});
+scannerDecoration(path.resolve(__dirname, 'server'), [/\.js$/, /\.js\.map$/, /\.d.ts$/]);
+registerControllerToRouter(router);
 
 app.use('/api/v1/', router);
 app.use(/^\/apps\/([^/]+)(.*)/, async function(req, res, next) {
@@ -43,12 +47,20 @@ app.use(/^\/apps\/([^/]+)(.*)/, async function(req, res, next) {
     }
 });
 
+app.use(function(err: Error, _: any, res: any, next: any) {
+    if (err instanceof CloudError) {
+        res.status(err.http_status);
+        return res.json(err);
+    }
+    return next(err);
+});
+
 import * as http from 'http';
 import * as net from 'net';
 async function main() {
+    await C.ready();
     await startServer({
-        port: 8090,
-        registry: "http://localhost:8080/api/v1/app"
+        registry: C.registry && C.registry.url
     });
 }
 
