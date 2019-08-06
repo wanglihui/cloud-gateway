@@ -37,8 +37,10 @@ app.use(/^\/apps\/([^/]+)(.*)/, async function(req, res, next) {
         const service = avaServices[idx];
         let host = service.ip;
         host = host.replace(/::/, '127.0.0.1');
+        let proxyUrl = `http://${host}:${service.port}${url}`
+        console.log(proxyUrl)
         const proxy = ProxyRequest({
-            url: `http://${host}:${service.port}${url}`,
+            url: proxyUrl,
         });
         proxy(req, res, next);
     } catch(err) {
