@@ -28,5 +28,6 @@
     "template"
   ],
   "author": "wanglihui.sjz@gmail.com",
-  "license": "ISC"
+  "license": "ISC",
+  "private": true
 }
