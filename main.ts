@@ -14,7 +14,7 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded());
 const ProxyRequest = require("express-request-proxy");
 
-scannerDecoration(path.resolve(__dirname, 'server'), [/\.js$/, /\.js\.map$/, /\.d.ts$/]);
+scannerDecoration(path.resolve(__dirname, 'server'), [/\.js\.map$/, /\.d.ts$/]);
 registerControllerToRouter(router);
 
 app.use('/api/v1/', router);
