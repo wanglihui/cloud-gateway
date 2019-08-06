@@ -71,7 +71,7 @@ interface IServerConfig {
 
 async function startServer(options?: IServerConfig) {
     let defaultOptions = {
-        port: 0,
+        port: C.port,
         registry: false,
     }
     options = Object.assign(defaultOptions, options) as IServerConfig;
