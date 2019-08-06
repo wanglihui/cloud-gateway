@@ -4,7 +4,7 @@
   "description": "cloud micservice gateway",
   "main": "dist/main.js",
   "dependencies": {
-    "cloud-conf": "0.0.2",
+    "cloud-conf": "0.0.3",
     "cloud-error": "0.0.1",
     "cloud-registry-client": "0.0.9",
     "death": "^1.1.0",

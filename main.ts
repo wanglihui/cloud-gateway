@@ -33,7 +33,8 @@ app.use(/^\/apps\/([^/]+)(.*)/, async function(req, res, next) {
                 msg: `SERVER "${serviceName}"  NOT EXISTS OR STATUS NOT ENABLED!`
             })
         }
-        const service = avaServices[0];
+        let idx = Math.floor(avaServices.length * Math.random());
+        const service = avaServices[idx];
         const proxy = ProxyRequest({
             url: `http://127.0.0.1:${service.port}${url}`,
         });
