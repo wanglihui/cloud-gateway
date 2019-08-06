@@ -75,7 +75,7 @@ interface IServerConfig {
 async function startServer(options?: IServerConfig) {
     let defaultOptions = {
         port: C.port,
-        registry: false,
+        registry: C.registry && C.registry.url,
     }
     options = Object.assign(defaultOptions, options) as IServerConfig;
     const server = http.createServer(app);
